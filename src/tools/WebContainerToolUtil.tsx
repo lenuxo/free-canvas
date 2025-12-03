@@ -71,4 +71,3 @@ export class WebContainerTool extends StateNode {
     this.editor.setCurrentTool('select')
   }
 }
-}

@@ -3,11 +3,12 @@ import {
 	MousePointer2,
 	Hand,
 	Type,
-	Image as ImageIcon
+	Image as ImageIcon,
+	Globe
 } from 'lucide-react'
 
 // 工具管理器类
-export class ToolManager {
+class ToolManager {
 	private editor: Editor | null = null
 
 	// 设置编辑器实例
@@ -28,6 +29,9 @@ export class ToolManager {
 				break
 			case 'text':
 				this.editor.setCurrentTool('text')
+				break
+			case 'web-container':
+				this.editor.setCurrentTool('web-container')
 				break
 			case 'image':
 				// 图片工具 - 使用 insertMedia helper
@@ -67,7 +71,11 @@ export class ToolManager {
 				}
 			],
 			customTools: [
-				// 预留给未来的自定义工具
+				{
+					id: 'web-container',
+					label: '网页容器 (W)',
+					icon: <Globe size={20} />
+				}
 			]
 		}
 	}

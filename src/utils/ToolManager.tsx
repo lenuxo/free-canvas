@@ -7,16 +7,39 @@ import {
 	Globe
 } from 'lucide-react'
 
-// 工具管理器类
+/**
+ * 工具管理器类 - 统一管理工具状态和编辑器访问
+ *
+ * 设计目的：
+ * - 集中管理编辑器实例，避免在多个组件中重复传递
+ * - 提供统一的工具切换接口，封装Tldraw API调用细节
+ * - 支持原生工具和自定义工具的混合管理
+ *
+ * 编辑器访问模式：
+ * - 通过setEditor()方法注入编辑器实例
+ * - 使用useEditor hook获取编辑器，然后传递给工具管理器
+ * - 工具管理器封装所有editor API调用，提供统一接口
+ */
 class ToolManager {
 	private editor: Editor | null = null
 
-	// 设置编辑器实例
+	/**
+	 * 设置编辑器实例 - 来自CustomToolbar组件的注入
+	 * 这是连接自定义UI与Tldraw功能的关键步骤
+	 */
 	setEditor(editor: Editor) {
 		this.editor = editor
 	}
 
-	// 切换到指定工具
+	/**
+	 * 统一的工具切换接口
+	 *
+	 * 功能说明：
+	 * - 封装Tldraw的setCurrentTool API调用
+	 * - 支持原生工具（select、hand、text等）
+	 * - 支持自定义工具（web-container）
+	 * - 提供统一的工具切换体验
+	 */
 	switchToTool(toolId: string) {
 		if (!this.editor) return
 

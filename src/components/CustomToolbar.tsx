@@ -8,20 +8,43 @@ interface CustomToolbarProps {
 	editor?: Editor | null
 }
 
+/**
+ * 自定义工具栏组件 - 替代Tldraw原生UI的关键组件
+ *
+ * 设计原理：
+ * - 在Tldraw组件内部渲染，通过onMount获取编辑器实例
+ * - 接收editor prop，用于调用Tldraw的各种API功能
+ * - 集成工具管理器，统一处理工具切换逻辑
+ *
+ * 工具栏集成要点：
+ * 1. 通过onMount回调获取编辑器实例，这是连接自定义UI与Tldraw功能的桥梁
+ * 2. 使用toolManager统一管理工具状态和切换逻辑
+ * 3. 支持原生工具和自定义工具的混合使用
+ */
 export function CustomToolbar({ selectedTool, onToolSelect, editor }: CustomToolbarProps) {
-	// 设置编辑器到工具管理器
+	/**
+	 * 编辑器实例设置 - 将editor传递给工具管理器
+	 * 确保工具管理器可以调用Tldraw的API（如setCurrentTool、select等）
+	 */
 	React.useEffect(() => {
 		if (editor) {
 			toolManager.setEditor(editor)
 		}
 	}, [editor])
 
-	// 获取默认 helpers
+	// 获取Tldraw默认辅助函数（如插入媒体等）
 	const { insertMedia } = useDefaultHelpers()
 
+	/**
+	 * 工具点击处理 - 统一的工具切换逻辑
+	 *
+	 * 处理流程：
+	 * 1. 更新本地选中状态（UI反馈）
+	 * 2. 调用工具管理器执行实际的工具切换
+	 */
 	const handleToolClick = (toolId: string) => {
 		onToolSelect(toolId)
-		// 使用工具管理器处理工具切换
+		// 委托给工具管理器处理具体的工具切换逻辑
 		if (editor) {
 			toolManager.switchToTool(toolId)
 		}

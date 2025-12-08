@@ -119,14 +119,6 @@ src/
 - 使用 React Hooks 进行状态管理
 - 支持通过 `useEditor` hook 访问编辑器功能
 
-## 许可证
-
-MIT License
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request 来改进项目。
-
 ---
 
 **技术提示**: 项目采用模块化架构设计，支持快速扩展新功能。开发时建议优先查阅 Tldraw 官方文档了解 API 详情。

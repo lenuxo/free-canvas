@@ -9,6 +9,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@paper-design/shaders-react": "^0.0.68",
 		"@tailwindcss/vite": "^4.1.17",
 		"lucide-react": "^0.555.0",
 		"react": "^18.3.1",

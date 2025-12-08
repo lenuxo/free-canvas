@@ -59,12 +59,12 @@ function App() {
 					// 依赖组件（当父组件被隐藏时，这些组件会自动隐藏）：
 					// Minimap: null,             // 小地图 - 依赖NavigationPanel，显示整个画布的缩略图
 					// SharePanel: null,          // 分享面板 - 依赖MenuPanel，协作和分享功能
-					// PageMenu: null,            // 页面菜单 - 依赖NavigationPanel
+					PageMenu: null,            // 页面菜单 - 依赖NavigationPanel
 
 					// 独立对话框和菜单组件：
 					// ActionsMenu: null,         // 操作菜单 - 快速操作菜单
 					// ContextMenu: null,         // 右键上下文菜单
-					// MainMenu: null,            // 主菜单
+					MainMenu: null,            // 主菜单
 					// HelpMenu: null,            // 帮助菜单
 					// KeyboardShortcutsDialog: null, // 快捷键对话框
 					// Dialogs: null,             // 所有对话框（包含各种模态框）

@@ -22,6 +22,7 @@ import {
 	heatmapInnerGlowStyle,
 	heatmapOuterGlowStyle,
 	heatmapScaleStyle,
+	heatmapImageStyle,
 	type BackgroundType,
 	type AnimationSpeed,
 	type PrimaryColor,
@@ -34,6 +35,7 @@ import {
 	type HeatmapInnerGlow,
 	type HeatmapOuterGlow,
 	type HeatmapScale,
+	type HeatmapImage,
 } from '../styles/dynamic-background-styles'
 
 /**
@@ -53,6 +55,7 @@ export interface DynamicBackgroundShape extends TLBaseBoxShape<'dynamic-backgrou
 	heatmapInnerGlow?: HeatmapInnerGlow
 	heatmapOuterGlow?: HeatmapOuterGlow
 	heatmapScale?: HeatmapScale
+	heatmapImage?: HeatmapImage
 }
 
 /**
@@ -84,6 +87,7 @@ export class DynamicBackgroundShapeUtil extends BaseBoxShapeUtil<DynamicBackgrou
 		heatmapInnerGlow: heatmapInnerGlowStyle,
 		heatmapOuterGlow: heatmapOuterGlowStyle,
 		heatmapScale: heatmapScaleStyle,
+		heatmapImage: heatmapImageStyle,
 	}
 
 	// 形状是否可以选择和编辑
@@ -109,6 +113,7 @@ export class DynamicBackgroundShapeUtil extends BaseBoxShapeUtil<DynamicBackgrou
 			heatmapInnerGlow: 0.5,
 			heatmapOuterGlow: 0.5,
 			heatmapScale: 0.75,
+			heatmapImage: 'https://shaders.paper.design/images/logos/diamond.svg',
 		}
 	}
 
@@ -156,6 +161,7 @@ export class DynamicBackgroundShapeUtil extends BaseBoxShapeUtil<DynamicBackgrou
 						innerGlow={shape.props.heatmapInnerGlow}
 						outerGlow={shape.props.heatmapOuterGlow}
 						scale={shape.props.heatmapScale}
+						image={shape.props.heatmapImage}
 						speed={animationSpeed}
 					/>
 				)

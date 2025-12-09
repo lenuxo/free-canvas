@@ -18,6 +18,7 @@ import {
 	heatmapInnerGlowStyle,
 	heatmapOuterGlowStyle,
 	heatmapScaleStyle,
+	heatmapImageStyle,
 } from '../styles/dynamic-background-styles'
 
 /**
@@ -48,6 +49,7 @@ function DynamicBackgroundStylePanel() {
 	const heatmapInnerGlow = styles.get(heatmapInnerGlowStyle)
 	const heatmapOuterGlow = styles.get(heatmapOuterGlowStyle)
 	const heatmapScale = styles.get(heatmapScaleStyle)
+	const heatmapImage = styles.get(heatmapImageStyle)
 
 	// 标记历史停止点，用于样式更改
 	const markHistoryPoint = () => {
@@ -224,6 +226,7 @@ function DynamicBackgroundStylePanel() {
 							const value = parseFloat(e.currentTarget.value)
 							setStyle(heatmapContourStyle, value)
 						}}
+						title="轮廓强度调节滑块"
 					/>
 					<div className="flex justify-between text-xs text-gray-500">
 						<span>0</span>
@@ -249,6 +252,7 @@ function DynamicBackgroundStylePanel() {
 							const value = parseFloat(e.currentTarget.value)
 							setStyle(heatmapAngleStyle, value)
 						}}
+						title="角度调节滑块"
 					/>
 					<div className="flex justify-between text-xs text-gray-500">
 						<span>0°</span>
@@ -274,6 +278,7 @@ function DynamicBackgroundStylePanel() {
 							const value = parseFloat(e.currentTarget.value)
 							setStyle(heatmapNoiseStyle, value)
 						}}
+						title="噪声调节滑块"
 					/>
 					<div className="flex justify-between text-xs text-gray-500">
 						<span>0</span>
@@ -299,6 +304,7 @@ function DynamicBackgroundStylePanel() {
 							const value = parseFloat(e.currentTarget.value)
 							setStyle(heatmapInnerGlowStyle, value)
 						}}
+						title="内部发光调节滑块"
 					/>
 					<div className="flex justify-between text-xs text-gray-500">
 						<span>0</span>
@@ -324,6 +330,7 @@ function DynamicBackgroundStylePanel() {
 							const value = parseFloat(e.currentTarget.value)
 							setStyle(heatmapOuterGlowStyle, value)
 						}}
+						title="外部发光调节滑块"
 					/>
 					<div className="flex justify-between text-xs text-gray-500">
 						<span>0</span>
@@ -349,11 +356,75 @@ function DynamicBackgroundStylePanel() {
 							const value = parseFloat(e.currentTarget.value)
 							setStyle(heatmapScaleStyle, value)
 						}}
+						title="缩放调节滑块"
 					/>
 					<div className="flex justify-between text-xs text-gray-500">
 						<span>0.01</span>
 						<span>0.75</span>
 						<span>4</span>
+					</div>
+				</div>
+
+				{/* 图片选择 */}
+				<div>
+					<label className="block text-sm font-medium text-gray-700 mb-2">
+						图片源
+					</label>
+					<div className="space-y-3">
+						{/* URL输入 */}
+						<div>
+							<input
+								type="text"
+								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+								value={heatmapImage?.type === 'mixed' ? '' : heatmapImage?.value || ''}
+								onChange={(e) => {
+									markHistoryPoint()
+									const value = e.currentTarget.value
+									setStyle(heatmapImageStyle, value)
+								}}
+								placeholder="输入图片URL或选择文件"
+								title="图片URL输入框"
+							/>
+						</div>
+						{/* 文件选择 */}
+						<div>
+							<input
+								type="file"
+								accept="image/*"
+								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+								onChange={(e) => {
+									const file = e.target.files?.[0]
+									if (file) {
+										markHistoryPoint()
+										// 读取文件为Data URL
+										const reader = new FileReader()
+										reader.onload = (event) => {
+											const dataUrl = event.target?.result as string
+											setStyle(heatmapImageStyle, dataUrl)
+										}
+										reader.readAsDataURL(file)
+									}
+								}}
+								title="图片文件选择器"
+							/>
+						</div>
+						{/* 当前图片预览 */}
+						{heatmapImage?.value && heatmapImage.value !== '' && (
+							<div className="mt-2">
+								<div className="text-xs text-gray-500 mb-1">当前图片预览：</div>
+								<div className="w-full h-20 border border-gray-200 rounded overflow-hidden bg-gray-50">
+									<img
+										src={heatmapImage.value}
+										alt="当前选择的图片"
+										className="w-full h-full object-cover"
+										onError={(e) => {
+											e.currentTarget.style.display = 'none'
+											console.warn('Failed to load image:', heatmapImage?.value)
+										}}
+									/>
+								</div>
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

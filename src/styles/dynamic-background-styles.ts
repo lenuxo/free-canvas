@@ -94,6 +94,11 @@ export const heatmapScaleStyle = StyleProp.define('dynamic-background:heatmapSca
 	}),
 })
 
+export const heatmapImageStyle = StyleProp.define('dynamic-background:heatmapImage', {
+	defaultValue: 'https://shaders.paper.design/images/logos/diamond.svg',
+	type: T.string,
+})
+
 // 导出所有样式类型
 export const dynamicBackgroundStyles = {
 	backgroundType: backgroundTypeStyle,
@@ -108,6 +113,7 @@ export const dynamicBackgroundStyles = {
 	heatmapInnerGlow: heatmapInnerGlowStyle,
 	heatmapOuterGlow: heatmapOuterGlowStyle,
 	heatmapScale: heatmapScaleStyle,
+	heatmapImage: heatmapImageStyle,
 }
 
 // 导出类型定义
@@ -123,3 +129,4 @@ export type HeatmapNoise = T.TypeOf<typeof heatmapNoiseStyle>
 export type HeatmapInnerGlow = T.TypeOf<typeof heatmapInnerGlowStyle>
 export type HeatmapOuterGlow = T.TypeOf<typeof heatmapOuterGlowStyle>
 export type HeatmapScale = T.TypeOf<typeof heatmapScaleStyle>
+export type HeatmapImage = T.TypeOf<typeof heatmapImageStyle>

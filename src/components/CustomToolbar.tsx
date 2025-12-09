@@ -1,9 +1,10 @@
 import React from 'react'
 import { Editor, useDefaultHelpers } from 'tldraw'
-import { toolManager } from '../utils/ToolManager'
+import { toolManager, ToolConfig } from '../utils/ToolManager'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { SimpleTooltip } from './SimpleTooltip'
+import { ToolsetMenu } from './ToolsetMenu'
 
 interface CustomToolbarProps {
 	selectedTool: string
@@ -53,14 +54,22 @@ export function CustomToolbar({ selectedTool, onToolSelect, editor }: CustomTool
 		}
 	}
 
+	const handleSubToolClick = (subToolId: string) => {
+		onToolSelect(subToolId)
+		// 委托给工具管理器处理具体的工具切换逻辑
+		if (editor) {
+			toolManager.switchToTool(subToolId)
+		}
+	}
+
 	const handleImageClick = () => {
 		// 直接调用 Tldraw 的原生图片上传
 		insertMedia()
 	}
 
 	// 获取工具配置
-	const toolConfig = toolManager.getToolConfigurations()
-	const { basicTools, mediaTools, customTools } = toolConfig
+	const toolConfig: ToolConfig = toolManager.getToolConfigurations()
+	const { basicTools, mediaTools, customTools, toolsets } = toolConfig
 
 	return (
 		<div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-2 flex gap-2 z-40 border border-gray-200">
@@ -108,7 +117,7 @@ export function CustomToolbar({ selectedTool, onToolSelect, editor }: CustomTool
 			))}
 
 			{/* 分隔线 */}
-			{(mediaTools.length > 0 && customTools.length > 0) && (
+			{(mediaTools.length > 0 && (customTools.length > 0 || toolsets.length > 0)) && (
 				<div className="border-l border-gray-300 mx-1" />
 			)}
 
@@ -129,6 +138,21 @@ export function CustomToolbar({ selectedTool, onToolSelect, editor }: CustomTool
 						{tool.icon}
 					</Button>
 				</SimpleTooltip>
+			))}
+
+			{/* 工具集组 */}
+			{toolsets.map((toolset) => (
+				<ToolsetMenu
+					key={toolset.id}
+					icon={toolset.icon}
+					label={toolset.label}
+					subTools={toolset.subTools.map(subTool => ({
+						...subTool,
+						onClick: () => handleSubToolClick(subTool.toolId)
+					}))}
+					isActive={toolset.subTools.some(subTool => selectedTool === subTool.toolId)}
+					delay={300}
+				/>
 			))}
 		</div>
 	)

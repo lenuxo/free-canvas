@@ -4,8 +4,43 @@ import {
 	Hand,
 	Type,
 	Image as ImageIcon,
-	Globe
+	Globe,
+	Waves
 } from 'lucide-react'
+import type { DynamicBackgroundShape } from '../tools/DynamicBackgroundShape'
+
+/**
+ * 单个工具的定义
+ */
+export interface Tool {
+	id: string
+	label: string
+	icon: React.ReactNode
+}
+
+/**
+ * 工具集的定义 - 包含多个子工具
+ */
+export interface Toolset {
+	id: string
+	label: string
+	icon: React.ReactNode
+	subTools: {
+		id: string
+		name: string
+		toolId: string // 实际要激活的工具ID
+	}[]
+}
+
+/**
+ * 工具配置的类型 - 支持单个工具和工具集
+ */
+export interface ToolConfig {
+	basicTools: Tool[]
+	mediaTools: Tool[]
+	customTools: Tool[]
+	toolsets: Toolset[]
+}
 
 /**
  * 工具管理器类 - 统一管理工具状态和编辑器访问
@@ -22,6 +57,7 @@ import {
  */
 class ToolManager {
 	private editor: Editor | null = null
+	private currentTool: string = 'select'
 
 	/**
 	 * 设置编辑器实例 - 来自CustomToolbar组件的注入
@@ -32,16 +68,25 @@ class ToolManager {
 	}
 
 	/**
+	 * 获取当前选中的工具
+	 */
+	getCurrentTool(): string {
+		return this.currentTool
+	}
+
+	/**
 	 * 统一的工具切换接口
 	 *
 	 * 功能说明：
 	 * - 封装Tldraw的setCurrentTool API调用
 	 * - 支持原生工具（select、hand、text等）
-	 * - 支持自定义工具（web-container）
+	 * - 支持自定义工具（web-container、dynamic-background）
 	 * - 提供统一的工具切换体验
 	 */
 	switchToTool(toolId: string) {
 		if (!this.editor) return
+
+		this.currentTool = toolId
 
 		switch (toolId) {
 			case 'select':
@@ -61,13 +106,38 @@ class ToolManager {
 				// 实际调用会在 CustomToolbar 组件中处理
 				// 这里只需要设置工具状态即可
 				break
+			// 动态背景工具集
+			case 'bg-gradient-flow':
+				this.editor.setCurrentTool('dynamic-background')
+				// 设置对应的背景类型
+				this.setBackgroundType(toolId)
+				break
 			default:
 				console.warn(`未知的工具ID: ${toolId}`)
 		}
 	}
 
+	/**
+	 * 设置动态背景类型 - 与工具状态集成
+	 */
+	private setBackgroundType(toolId: string) {
+		const typeMap: Record<string, DynamicBackgroundShape['props']['backgroundType']> = {
+			'bg-gradient-flow': 'gradient-flow',
+		}
+
+		const backgroundType = typeMap[toolId]
+		if (backgroundType) {
+			// 可以通过状态管理或其他方式传递给工具
+			// 这里简化处理，实际可能需要通过全局状态或事件系统
+			this.currentBackgroundType = backgroundType
+		}
+	}
+
+	// 当前背景类型状态
+	private currentBackgroundType: DynamicBackgroundShape['props']['backgroundType'] = 'gradient-flow'
+
 	// 获取工具配置
-	getToolConfigurations() {
+	getToolConfigurations(): ToolConfig {
 		return {
 			basicTools: [
 				{
@@ -98,6 +168,21 @@ class ToolManager {
 					id: 'web-container',
 					label: '网页容器 (W)',
 					icon: <Globe size={20} />
+				}
+			],
+			// 动态背景工具集
+			toolsets: [
+				{
+					id: 'dynamic-backgrounds',
+					label: '动态背景',
+					icon: <Waves size={20} />,
+					subTools: [
+						{
+							id: 'gradient-flow',
+							name: '渐变流动',
+							toolId: 'bg-gradient-flow'
+						}
+					]
 				}
 			]
 		}

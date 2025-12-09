@@ -3,7 +3,10 @@ import { useState, useCallback } from 'react'
 import { CustomToolbar } from './components/CustomToolbar'
 import { WebContainerShapeUtil } from './tools/FinalWebContainer'
 import { WebContainerTool } from './tools/WebContainerToolUtil'
+import { DynamicBackgroundShapeUtil } from './tools/DynamicBackgroundShape'
+import { DynamicBackgroundTool } from './tools/DynamicBackgroundTool'
 import WebContainerToolbar from './components/WebContainerToolbar'
+import DynamicBackgroundStylePanel from './components/DynamicBackgroundStylePanel'
 
 /**
  * 主应用组件 - 集成自定义工具和UI的入口点
@@ -33,7 +36,10 @@ function App() {
 	}, [])
 
 	// 注册自定义形状工具类 - Tldraw需要知道哪些自定义形状可用
-	const customShapes = [WebContainerShapeUtil]
+	const customShapes = [WebContainerShapeUtil, DynamicBackgroundShapeUtil]
+
+	// 注册自定义工具
+	const customTools = [WebContainerTool, DynamicBackgroundTool]
 
 	return (
 		// 全屏容器 - 确保白板占满整个视窗
@@ -41,13 +47,16 @@ function App() {
 			<Tldraw
 				onMount={handleMount}
 				shapeUtils={customShapes} // 注册自定义形状
-				tools={[WebContainerTool]} // 注册自定义工具
+				tools={customTools} // 注册自定义工具
 				components={{
 					// 隐藏原生工具栏，但保留其他UI组件（菜单、样式面板等）
 					Toolbar: null,
 
 					// 覆盖图片工具栏，为WebContainer显示自定义URL编辑工具栏
 					ImageToolbar: () => <WebContainerToolbar />,
+
+					// 覆盖样式面板，为动态背景显示自定义配置项
+					StylePanel: () => <DynamicBackgroundStylePanel />,
 
 					// 其他可以配置的UI组件（设为null可隐藏）：
 

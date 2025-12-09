@@ -6,6 +6,7 @@ import {
 } from 'tldraw'
 import { createShapeId } from 'tldraw'
 import type { DynamicBackgroundShape } from './DynamicBackgroundShape'
+import { toolManager } from '../utils/ToolManager'
 
 /**
  * 动态背景工具状态
@@ -73,6 +74,9 @@ class DynamicBackgroundToolState extends StateNode {
 	private createBackground(x: number, y: number, width: number, height: number) {
 		const shapeId = createShapeId()
 
+		// 从工具管理器获取当前应该创建的背景类型
+		const backgroundType = toolManager.getCurrentBackgroundType()
+
 		const shape: DynamicBackgroundShape = {
 			id: shapeId,
 			type: 'dynamic-background',
@@ -81,7 +85,7 @@ class DynamicBackgroundToolState extends StateNode {
 			props: {
 				w: width,
 				h: height,
-				backgroundType: this.backgroundType,
+				backgroundType: backgroundType,
 			},
 			opacity: 1,
 			index: 'a1',

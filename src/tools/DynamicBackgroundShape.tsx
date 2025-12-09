@@ -7,16 +7,33 @@ import {
 } from 'tldraw'
 import {
 	GradientFlowBackground,
+	HeatmapBackground,
 } from '../components/dynamic-backgrounds'
 import {
 	backgroundTypeStyle,
 	animationSpeedStyle,
 	primaryColorStyle,
 	secondaryColorStyle,
+	heatmapColorsStyle,
+	heatmapColorBackStyle,
+	heatmapContourStyle,
+	heatmapAngleStyle,
+	heatmapNoiseStyle,
+	heatmapInnerGlowStyle,
+	heatmapOuterGlowStyle,
+	heatmapScaleStyle,
 	type BackgroundType,
 	type AnimationSpeed,
 	type PrimaryColor,
 	type SecondaryColor,
+	type HeatmapColors,
+	type HeatmapColorBack,
+	type HeatmapContour,
+	type HeatmapAngle,
+	type HeatmapNoise,
+	type HeatmapInnerGlow,
+	type HeatmapOuterGlow,
+	type HeatmapScale,
 } from '../styles/dynamic-background-styles'
 
 /**
@@ -27,6 +44,15 @@ export interface DynamicBackgroundShape extends TLBaseBoxShape<'dynamic-backgrou
 	animationSpeed: AnimationSpeed
 	primaryColor: PrimaryColor
 	secondaryColor: SecondaryColor
+	// Heatmap 特有属性
+	heatmapColors?: HeatmapColors
+	heatmapColorBack?: HeatmapColorBack
+	heatmapContour?: HeatmapContour
+	heatmapAngle?: HeatmapAngle
+	heatmapNoise?: HeatmapNoise
+	heatmapInnerGlow?: HeatmapInnerGlow
+	heatmapOuterGlow?: HeatmapOuterGlow
+	heatmapScale?: HeatmapScale
 }
 
 /**
@@ -49,6 +75,15 @@ export class DynamicBackgroundShapeUtil extends BaseBoxShapeUtil<DynamicBackgrou
 		animationSpeed: animationSpeedStyle,
 		primaryColor: primaryColorStyle,
 		secondaryColor: secondaryColorStyle,
+		// Heatmap 特有属性
+		heatmapColors: heatmapColorsStyle,
+		heatmapColorBack: heatmapColorBackStyle,
+		heatmapContour: heatmapContourStyle,
+		heatmapAngle: heatmapAngleStyle,
+		heatmapNoise: heatmapNoiseStyle,
+		heatmapInnerGlow: heatmapInnerGlowStyle,
+		heatmapOuterGlow: heatmapOuterGlowStyle,
+		heatmapScale: heatmapScaleStyle,
 	}
 
 	// 形状是否可以选择和编辑
@@ -65,6 +100,15 @@ export class DynamicBackgroundShapeUtil extends BaseBoxShapeUtil<DynamicBackgrou
 			animationSpeed: 1.0,
 			primaryColor: '#3b82f6',
 			secondaryColor: '#8b5cf6',
+			// Heatmap 默认值
+			heatmapColors: '#112069,#1f3ca3,#3265e7,#6bd8ff,#ffe77a,#ff9a1f,#ff4d00',
+			heatmapColorBack: '#000000',
+			heatmapContour: 0.5,
+			heatmapAngle: 0,
+			heatmapNoise: 0,
+			heatmapInnerGlow: 0.5,
+			heatmapOuterGlow: 0.5,
+			heatmapScale: 0.75,
 		}
 	}
 
@@ -80,7 +124,7 @@ export class DynamicBackgroundShapeUtil extends BaseBoxShapeUtil<DynamicBackgrou
 					opacity: shape.opacity,
 				}}
 			>
-				<div className="w-full h-full overflow-hidden rounded-lg shadow-lg">
+				<div className="w-full h-full overflow-hidden">
 					{this.renderBackgroundComponent(shape)}
 				</div>
 			</HTMLContainer>
@@ -89,10 +133,35 @@ export class DynamicBackgroundShapeUtil extends BaseBoxShapeUtil<DynamicBackgrou
 
 	// 获取背景组件的渲染函数
 	private renderBackgroundComponent(shape: DynamicBackgroundShape) {
-		const { animationSpeed, primaryColor, secondaryColor } = shape.props
+		const { backgroundType, animationSpeed, primaryColor, secondaryColor } = shape.props
 
-		// 目前只支持渐变流动背景
-		return <GradientFlowBackground animationSpeed={animationSpeed} primaryColor={primaryColor} secondaryColor={secondaryColor} />
+		switch (backgroundType) {
+			case 'gradient-flow':
+				return <GradientFlowBackground animationSpeed={animationSpeed} primaryColor={primaryColor} secondaryColor={secondaryColor} />
+			case 'heatmap':
+				// 解析颜色字符串为数组
+				const colors = shape.props.heatmapColors?.split(',') || [
+					'#112069', '#1f3ca3', '#3265e7', '#6bd8ff',
+					'#ffe77a', '#ff9a1f', '#ff4d00'
+				]
+				return (
+					<HeatmapBackground
+						width={shape.props.w}
+						height={shape.props.h}
+						colors={colors}
+						colorBack={shape.props.heatmapColorBack}
+						contour={shape.props.heatmapContour}
+						angle={shape.props.heatmapAngle}
+						noise={shape.props.heatmapNoise}
+						innerGlow={shape.props.heatmapInnerGlow}
+						outerGlow={shape.props.heatmapOuterGlow}
+						scale={shape.props.heatmapScale}
+						speed={animationSpeed}
+					/>
+				)
+			default:
+				return <GradientFlowBackground animationSpeed={animationSpeed} primaryColor={primaryColor} secondaryColor={secondaryColor} />
+		}
 	}
 
 	// 获取指示器（选中时显示的边框和调整手柄）
@@ -128,12 +197,24 @@ export class DynamicBackgroundShapeUtil extends BaseBoxShapeUtil<DynamicBackgrou
 
 	// 处理形状属性更新
 	override onResize = (shape: DynamicBackgroundShape, info: any) => {
+		const { newPoint, initialBounds, scaleX, scaleY } = info
+
+		// 计算新的宽度和高度
+		const newWidth = Math.max(200, initialBounds.w * scaleX)
+		const newHeight = Math.max(150, initialBounds.h * scaleY)
+
+		// 确保我们不会得到 NaN
+		if (isNaN(newWidth) || isNaN(newHeight)) {
+			console.warn('Invalid dimensions detected, skipping resize')
+			return shape
+		}
+
 		return {
 			...shape,
 			props: {
 				...shape.props,
-				w: Math.max(200, shape.props.w + info.deltaX),
-				h: Math.max(150, shape.props.h + info.deltaY),
+				w: newWidth,
+				h: newHeight,
 			},
 		}
 	}

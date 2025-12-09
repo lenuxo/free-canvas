@@ -1,7 +1,9 @@
 import React from 'react'
 import { Editor, useDefaultHelpers } from 'tldraw'
 import { toolManager } from '../utils/ToolManager'
-import { Tooltip } from './Tooltip'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { SimpleTooltip } from './SimpleTooltip'
 
 interface CustomToolbarProps {
 	selectedTool: string
@@ -61,22 +63,24 @@ export function CustomToolbar({ selectedTool, onToolSelect, editor }: CustomTool
 	const { basicTools, mediaTools, customTools } = toolConfig
 
 	return (
-		<div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-2 flex gap-2 z-50 border border-gray-200">
+		<div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-2 flex gap-2 z-40 border border-gray-200">
 			{/* 基础工具组 */}
 			{basicTools.map((tool) => (
-				<Tooltip key={tool.id} content={tool.label} position="bottom">
-					<button
-						type="button"
+				<SimpleTooltip key={tool.id} content={tool.label} position="bottom" delay={300}>
+					<Button
+						variant="ghost"
+						size="sm"
 						onClick={() => handleToolClick(tool.id)}
-						className={`p-2 rounded transition-all duration-200 flex items-center justify-center ${
+						className={cn(
+							"p-2 h-auto transition-all duration-200 flex items-center justify-center",
 							selectedTool === tool.id
-								? 'bg-blue-500 text-white shadow-md transform scale-105'
+								? 'bg-blue-500 text-white shadow-md transform scale-105 hover:bg-blue-600'
 								: 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:scale-105'
-						}`}
+						)}
 					>
 						{tool.icon}
-					</button>
-				</Tooltip>
+					</Button>
+				</SimpleTooltip>
 			))}
 
 			{/* 分隔线 */}
@@ -86,19 +90,21 @@ export function CustomToolbar({ selectedTool, onToolSelect, editor }: CustomTool
 
 			{/* Media工具组 */}
 			{mediaTools.map((tool) => (
-				<Tooltip key={tool.id} content={tool.label} position="bottom">
-					<button
-						type="button"
+				<SimpleTooltip key={tool.id} content={tool.label} position="bottom" delay={300}>
+					<Button
+						variant="ghost"
+						size="sm"
 						onClick={tool.id === 'image' ? handleImageClick : () => handleToolClick(tool.id)}
-						className={`p-2 rounded transition-all duration-200 flex items-center justify-center ${
+						className={cn(
+							"p-2 h-auto transition-all duration-200 flex items-center justify-center",
 							selectedTool === tool.id
-								? 'bg-blue-500 text-white shadow-md transform scale-105'
+								? 'bg-blue-500 text-white shadow-md transform scale-105 hover:bg-blue-600'
 								: 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:scale-105'
-						}`}
+						)}
 					>
 						{tool.icon}
-					</button>
-				</Tooltip>
+					</Button>
+				</SimpleTooltip>
 			))}
 
 			{/* 分隔线 */}
@@ -108,19 +114,21 @@ export function CustomToolbar({ selectedTool, onToolSelect, editor }: CustomTool
 
 			{/* 自定义工具组 */}
 			{customTools.map((tool) => (
-				<Tooltip key={tool.id} content={tool.label} position="bottom">
-					<button
-						type="button"
+				<SimpleTooltip key={tool.id} content={tool.label} position="bottom" delay={300}>
+					<Button
+						variant="ghost"
+						size="sm"
 						onClick={() => handleToolClick(tool.id)}
-						className={`p-2 rounded transition-all duration-200 flex items-center justify-center ${
+						className={cn(
+							"p-2 h-auto transition-all duration-200 flex items-center justify-center",
 							selectedTool === tool.id
-								? 'bg-green-500 text-white shadow-md transform scale-105'
+								? 'bg-green-500 text-white shadow-md transform scale-105 hover:bg-green-600'
 								: 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:scale-105'
-						}`}
+						)}
 					>
 						{tool.icon}
-					</button>
-				</Tooltip>
+					</Button>
+				</SimpleTooltip>
 			))}
 		</div>
 	)

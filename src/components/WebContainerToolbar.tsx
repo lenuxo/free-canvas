@@ -1,5 +1,8 @@
 import React, { useState } from 'react'
 import { useEditor, useValue } from 'tldraw'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 /**
  * WebContainer自定义工具栏组件 - 模仿视频组件的alt text编辑功能
@@ -48,7 +51,7 @@ function WebContainerToolbar() {
   // 转换为屏幕坐标
   const screenPoint = editor.pageToScreen(centerPoint)
 
-  const currentUrl = selectedWebContainer.props?.url || ''
+  const currentUrl = (selectedWebContainer.props as any)?.url || ''
 
   const handleEditUrlStart = () => {
     setTempUrl(currentUrl)
@@ -118,9 +121,10 @@ function WebContainerToolbar() {
           </div>
 
           {/* 编辑按钮 */}
-          <button
+          <Button
             onClick={handleEditUrlStart}
-            className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors flex items-center gap-1"
+            size="sm"
+            className="px-2 py-1 text-xs h-auto flex items-center gap-1"
             title="编辑网页地址"
           >
             <svg
@@ -137,23 +141,22 @@ function WebContainerToolbar() {
               />
             </svg>
             编辑URL
-          </button>
+          </Button>
         </>
       ) : (
         <>
           {/* URL输入框 */}
           <div className="flex flex-col gap-1">
-            <input
+            <Input
               type="url"
               value={tempUrl}
               onChange={handleUrlChange}
               onKeyDown={handleKeyDown}
               placeholder="输入网页地址..."
-              className={`px-2 py-1 text-xs border rounded w-48 outline-none transition-colors ${
-                urlError
-                  ? 'border-red-300 focus:border-red-400'
-                  : 'border-gray-300 focus:border-blue-400 focus:ring-1 focus:ring-blue-400'
-              }`}
+              className={cn(
+                "w-48 text-xs h-auto px-2 py-1",
+                urlError && "border-red-300 focus:border-red-400"
+              )}
               autoFocus
             />
             {urlError && (
@@ -162,27 +165,30 @@ function WebContainerToolbar() {
           </div>
 
           {/* 取消按钮 */}
-          <button
+          <Button
             onClick={handleUrlCancel}
-            className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+            variant="secondary"
+            size="sm"
+            className="px-2 py-1 text-xs h-auto"
             title="取消编辑"
           >
             取消
-          </button>
+          </Button>
 
           {/* 保存按钮 */}
-          <button
+          <Button
             onClick={handleUrlSave}
             disabled={!!urlError}
-            className={`px-2 py-1 text-xs rounded transition-colors ${
-              urlError
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-green-500 text-white hover:bg-green-600'
-            }`}
+            variant={urlError ? "secondary" : "default"}
+            size="sm"
+            className={cn(
+              "px-2 py-1 text-xs h-auto",
+              urlError && "cursor-not-allowed"
+            )}
             title="保存URL"
           >
             保存
-          </button>
+          </Button>
         </>
       )}
     </div>

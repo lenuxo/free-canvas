@@ -10,6 +10,11 @@ import { toolManager } from '../utils/ToolManager'
 
 /**
  * 动态背景工具状态
+ *
+ * 🚨 提醒：新建拖拽工具时，建议使用 DraggableShapeTool 基类
+ * - 参考示例：WebContainerToolUtil.tsx
+ * - 可以减少70%的重复代码
+ * - 提供统一的拖拽创建体验
  */
 class DynamicBackgroundToolState extends StateNode {
 	static override id = 'dynamic-background'
@@ -17,6 +22,7 @@ class DynamicBackgroundToolState extends StateNode {
 	private backgroundType: DynamicBackgroundShape['props']['backgroundType'] = 'gradient-flow'
 	private startPagePoint: { x: number; y: number } | null = null
 	private isDragging = false
+	private previewShapeId: string | null = null
 
 	/**
 	 * 设置背景类型
@@ -33,30 +39,110 @@ class DynamicBackgroundToolState extends StateNode {
 		this.editor.setCursor({ type: 'default', rotation: 0 })
 		this.startPagePoint = null
 		this.isDragging = false
+		// 清理预览形状
+		if (this.previewShapeId) {
+			this.editor.deleteShape(this.previewShapeId)
+			this.previewShapeId = null
+		}
 	}
 
 	override onPointerDown: (info: TLPointerEventInfo) => void = (info) => {
 		this.startPagePoint = { ...info.point }
 		this.isDragging = true
+
+		// 创建预览形状
+		this.createPreviewShape()
 	}
 
 	override onPointerMove: (info: TLPointerEventInfo) => void = (info) => {
 		if (!this.isDragging || !this.startPagePoint) return
-		// 可以在这里添加拖拽预览
+
+		// 更新预览形状的大小和位置
+		this.updatePreviewShape(info.point)
+	}
+
+	/**
+	 * 创建预览形状
+	 */
+	private createPreviewShape() {
+		if (!this.startPagePoint) return
+
+		const previewId = createShapeId()
+		this.previewShapeId = previewId
+
+		// 将屏幕坐标转换为画板坐标
+		const startPoint = this.editor.screenToPage(this.startPagePoint)
+
+		// 创建预览形状（初始为最小尺寸）
+		this.editor.createShape<DynamicBackgroundShape>({
+			id: previewId,
+			type: 'dynamic-background',
+			x: startPoint.x,
+			y: startPoint.y,
+			props: {
+				w: 1,
+				h: 1,
+				backgroundType: this.backgroundType,
+			},
+			opacity: 0.3, // 更透明的预览，触发简化的预览样式
+			index: 'a1',
+			isLocked: false,
+			parentId: 'page:page',
+		})
+	}
+
+	/**
+	 * 更新预览形状的大小和位置
+	 */
+	private updatePreviewShape(currentPoint: { x: number; y: number }) {
+		if (!this.previewShapeId || !this.startPagePoint) return
+
+		// 转换坐标
+		const startPoint = this.editor.screenToPage(this.startPagePoint)
+		const endPoint = this.editor.screenToPage(currentPoint)
+
+		// 计算矩形的位置和大小
+		const x = Math.min(startPoint.x, endPoint.x)
+		const y = Math.min(startPoint.y, endPoint.y)
+		const width = Math.abs(endPoint.x - startPoint.x)
+		const height = Math.abs(endPoint.y - startPoint.y)
+
+		// 更新预览形状
+		this.editor.updateShape<DynamicBackgroundShape>({
+			id: this.previewShapeId,
+			type: 'dynamic-background',
+			x,
+			y,
+			props: {
+				w: width,
+				h: height,
+				backgroundType: this.backgroundType,
+			},
+			opacity: 0.3, // 保持预览透明度
+		})
 	}
 
 	override onPointerUp: (info: TLPointerEventInfo) => void = (info) => {
 		if (!this.isDragging || !this.startPagePoint) return
 
-		const endPoint = info.point
-		const width = Math.abs(endPoint.x - this.startPagePoint.x)
-		const height = Math.abs(endPoint.y - this.startPagePoint.y)
+		// 将屏幕坐标转换为画板坐标
+		const endPoint = this.editor.screenToPage(info.point)
+		const startPoint = this.editor.screenToPage(this.startPagePoint)
+
+		const width = Math.abs(endPoint.x - startPoint.x)
+		const height = Math.abs(endPoint.y - startPoint.y)
+
+		// 清理预览形状
+		if (this.previewShapeId) {
+			this.editor.deleteShape(this.previewShapeId)
+			this.previewShapeId = null
+		}
 
 		// 只有当拖拽距离超过一定阈值时才创建形状
 		if (width > 50 && height > 50) {
 			this.createBackground(
-				Math.min(this.startPagePoint.x, endPoint.x),
-				Math.min(this.startPagePoint.y, endPoint.y),
+				Math.min(startPoint.x, endPoint.x),
+				Math.min(startPoint.y, endPoint.y),
 				width,
 				height
 			)
@@ -67,8 +153,10 @@ class DynamicBackgroundToolState extends StateNode {
 	}
 
 	override onClick: (info: TLClickEventInfo) => void = (info) => {
+		// 将屏幕坐标转换为画板坐标
+		const pagePoint = this.editor.screenToPage(info.point)
 		// 快速点击创建默认大小的背景
-		this.createBackground(info.point.x - 300, info.point.y - 200, 600, 400)
+		this.createBackground(pagePoint.x - 300, pagePoint.y - 200, 600, 400)
 	}
 
 	private createBackground(x: number, y: number, width: number, height: number) {
@@ -102,6 +190,11 @@ class DynamicBackgroundToolState extends StateNode {
 	override onKeyDown?: (info: TLKeyboardEventInfo) => void = (info) => {
 		// ESC键退出工具
 		if (info.code === 'Escape') {
+			// 清理预览形状
+			if (this.previewShapeId) {
+				this.editor.deleteShape(this.previewShapeId)
+				this.previewShapeId = null
+			}
 			this.editor.setCurrentTool('select')
 		}
 	}

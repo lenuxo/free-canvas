@@ -59,12 +59,13 @@ function WebContainerToolbar() {
   }
 
   const handleUrlSave = () => {
+    const normalizedUrl = normalizeUrl(tempUrl)
     editor.updateShape({
       id: selectedWebContainer.id,
       type: 'web-container',
       props: {
         ...selectedWebContainer.props,
-        url: tempUrl,
+        url: normalizedUrl,
       },
     })
     setIsEditingUrl(false)
@@ -87,18 +88,39 @@ function WebContainerToolbar() {
     }
   }
 
+  /**
+   * 标准化URL - 支持各种格式的URL输入
+   * 与WebContainer组件保持一致的URL处理逻辑
+   */
+  const normalizeUrl = (url: string): string => {
+    if (!url || typeof url !== 'string') return ''
+    const trimmedUrl = url.trim()
+    if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+      return trimmedUrl
+    }
+    if (trimmedUrl.includes('.')) {
+      if (trimmedUrl.startsWith('www.')) {
+        return `https://${trimmedUrl}`
+      }
+      return `https://www.${trimmedUrl}`
+    }
+    return ''
+  }
+
   // URL验证函数
   const isValidUrl = (url: string) => {
     if (!url.trim()) return true // 允许空URL
+    const normalizedUrl = normalizeUrl(url)
+    if (!normalizedUrl) return false
     try {
-      new URL(url)
+      new URL(normalizedUrl)
       return true
     } catch {
       return false
     }
   }
 
-  const urlError = tempUrl && !isValidUrl(tempUrl) ? '请输入有效的网页地址' : ''
+  const urlError = tempUrl && !isValidUrl(tempUrl) ? '请输入有效的网页地址（支持 www.google.com 格式）' : ''
 
   return (
     <div
@@ -152,7 +174,7 @@ function WebContainerToolbar() {
               value={tempUrl}
               onChange={handleUrlChange}
               onKeyDown={handleKeyDown}
-              placeholder="输入网页地址..."
+              placeholder="如 www.google.com 或 https://example.com"
               className={cn(
                 "w-48 text-xs h-auto px-2 py-1",
                 urlError && "border-red-300 focus:border-red-400"

@@ -4,7 +4,7 @@ import { T } from '@tldraw/validate'
 // 动态背景类型样式
 export const backgroundTypeStyle = StyleProp.defineEnum('dynamic-background:type', {
 	defaultValue: 'gradient-flow',
-	values: ['gradient-flow', 'heatmap'] as const,
+	values: ['gradient-flow', 'heatmap', 'grain-gradient'] as const,
 })
 
 // 动画速度样式
@@ -99,6 +99,49 @@ export const heatmapImageStyle = StyleProp.define('dynamic-background:heatmapIma
 	type: T.string,
 })
 
+// Grain Gradient 特有样式属性
+export const grainColorsStyle = StyleProp.define('dynamic-background:grainColors', {
+	defaultValue: '#702200,#eaba7b,#38b422',
+	type: T.string,
+})
+
+export const grainColorBackStyle = StyleProp.define('dynamic-background:grainColorBack', {
+	defaultValue: '#0a0000',
+	type: T.string,
+})
+
+export const grainSoftnessStyle = StyleProp.define('dynamic-background:grainSoftness', {
+	defaultValue: 0,
+	type: T.number.check((n) => {
+		if (n < 0 || n > 1) {
+			throw new Error('Softness must be between 0 and 1')
+		}
+	}),
+})
+
+export const grainIntensityStyle = StyleProp.define('dynamic-background:grainIntensity', {
+	defaultValue: 0.2,
+	type: T.number.check((n) => {
+		if (n < 0 || n > 1) {
+			throw new Error('Intensity must be between 0 and 1')
+		}
+	}),
+})
+
+export const grainNoiseStyle = StyleProp.define('dynamic-background:grainNoise', {
+	defaultValue: 1,
+	type: T.number.check((n) => {
+		if (n < 0 || n > 1) {
+			throw new Error('Noise must be between 0 and 1')
+		}
+	}),
+})
+
+export const grainShapeStyle = StyleProp.defineEnum('dynamic-background:grainShape', {
+	defaultValue: 'sphere',
+	values: ['wave', 'dots', 'truchet', 'corners', 'ripple', 'blob', 'sphere'] as const,
+})
+
 // 导出所有样式类型
 export const dynamicBackgroundStyles = {
 	backgroundType: backgroundTypeStyle,
@@ -114,6 +157,12 @@ export const dynamicBackgroundStyles = {
 	heatmapOuterGlow: heatmapOuterGlowStyle,
 	heatmapScale: heatmapScaleStyle,
 	heatmapImage: heatmapImageStyle,
+	grainColors: grainColorsStyle,
+	grainColorBack: grainColorBackStyle,
+	grainSoftness: grainSoftnessStyle,
+	grainIntensity: grainIntensityStyle,
+	grainNoise: grainNoiseStyle,
+	grainShape: grainShapeStyle,
 }
 
 // 导出类型定义
@@ -130,3 +179,9 @@ export type HeatmapInnerGlow = T.TypeOf<typeof heatmapInnerGlowStyle>
 export type HeatmapOuterGlow = T.TypeOf<typeof heatmapOuterGlowStyle>
 export type HeatmapScale = T.TypeOf<typeof heatmapScaleStyle>
 export type HeatmapImage = T.TypeOf<typeof heatmapImageStyle>
+export type GrainColors = T.TypeOf<typeof grainColorsStyle>
+export type GrainColorBack = T.TypeOf<typeof grainColorBackStyle>
+export type GrainSoftness = T.TypeOf<typeof grainSoftnessStyle>
+export type GrainIntensity = T.TypeOf<typeof grainIntensityStyle>
+export type GrainNoise = T.TypeOf<typeof grainNoiseStyle>
+export type GrainShape = T.TypeOf<typeof grainShapeStyle>

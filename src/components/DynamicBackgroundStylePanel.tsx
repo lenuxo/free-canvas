@@ -19,6 +19,12 @@ import {
 	heatmapOuterGlowStyle,
 	heatmapScaleStyle,
 	heatmapImageStyle,
+	grainColorsStyle,
+	grainColorBackStyle,
+	grainSoftnessStyle,
+	grainIntensityStyle,
+	grainNoiseStyle,
+	grainShapeStyle,
 } from '../styles/dynamic-background-styles'
 
 /**
@@ -50,6 +56,14 @@ function DynamicBackgroundStylePanel() {
 	const heatmapOuterGlow = styles.get(heatmapOuterGlowStyle)
 	const heatmapScale = styles.get(heatmapScaleStyle)
 	const heatmapImage = styles.get(heatmapImageStyle)
+
+	// Grain Gradient 特有样式
+	const grainColors = styles.get(grainColorsStyle)
+	const grainColorBack = styles.get(grainColorBackStyle)
+	const grainSoftness = styles.get(grainSoftnessStyle)
+	const grainIntensity = styles.get(grainIntensityStyle)
+	const grainNoise = styles.get(grainNoiseStyle)
+	const grainShape = styles.get(grainShapeStyle)
 
 	// 标记历史停止点，用于样式更改
 	const markHistoryPoint = () => {
@@ -431,11 +445,199 @@ function DynamicBackgroundStylePanel() {
 		)
 	}
 
+	// 渲染Grain Gradient背景配置
+	const renderGrainGradientConfig = () => {
+		// 解析颜色字符串为数组
+		const colorsArray = grainColors?.value?.split(',') || [
+			'#702200', '#eaba7b', '#38b422'
+		]
+
+		// 形状选项
+		const shapeOptions = [
+			{ value: 'wave', label: '波浪' },
+			{ value: 'dots', label: '点阵' },
+			{ value: 'truchet', label: 'Truchet' },
+			{ value: 'corners', label: '边角' },
+			{ value: 'ripple', label: '涟漪' },
+			{ value: 'blob', label: '斑点' },
+			{ value: 'sphere', label: '球体' },
+		]
+
+		return (
+			<div className="space-y-4">
+				{/* 颜色列表 */}
+				<div>
+					<label className="block text-sm font-medium text-gray-700 mb-2">
+						颜色列表 (用逗号分隔)
+					</label>
+					<textarea
+						className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+						value={grainColors?.type === 'mixed' ? '' : grainColors?.value || ''}
+						onChange={(e) => {
+							markHistoryPoint()
+							const value = e.currentTarget.value
+							setStyle(grainColorsStyle, value)
+						}}
+						placeholder="#702200,#eaba7b,#38b422"
+						rows={2}
+					/>
+					<div className="mt-2 flex flex-wrap gap-1">
+						{colorsArray.map((color, index) => (
+							<div
+								key={index}
+								className="w-6 h-6 rounded border border-gray-300"
+								style={{ backgroundColor: color }}
+								title={color}
+							/>
+						))}
+					</div>
+				</div>
+
+				{/* 背景色 */}
+				<div>
+					<label className="block text-sm font-medium text-gray-700 mb-2">
+						背景色
+					</label>
+					<div className="flex items-center space-x-2">
+						<input
+							type="color"
+							className="h-10 w-20 border border-gray-300 rounded cursor-pointer"
+							value={grainColorBack?.type === 'mixed' ? '#0a0000' : grainColorBack?.value || '#0a0000'}
+							onChange={(e) => {
+								markHistoryPoint()
+								const value = e.currentTarget.value
+								if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+									setStyle(grainColorBackStyle, value)
+								}
+							}}
+							title="背景色选择器"
+						/>
+						<input
+							type="text"
+							className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+							value={grainColorBack?.type === 'mixed' ? '' : grainColorBack?.value || ''}
+							onChange={(e) => {
+								markHistoryPoint()
+								const value = e.currentTarget.value
+								if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+									setStyle(grainColorBackStyle, value)
+								}
+							}}
+							placeholder="#0a0000"
+						/>
+					</div>
+				</div>
+
+				{/* 形状选择 */}
+				<div>
+					<label className="block text-sm font-medium text-gray-700 mb-2">
+						动画形态
+					</label>
+					<select
+						className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+						value={grainShape?.type === 'mixed' ? 'sphere' : grainShape?.value || 'sphere'}
+						onChange={(e) => {
+							markHistoryPoint()
+							const value = e.currentTarget.value
+							setStyle(grainShapeStyle, value)
+						}}
+						title="动画形态选择器"
+					>
+						{shapeOptions.map((option) => (
+							<option key={option.value} value={option.value}>
+								{option.label}
+							</option>
+						))}
+					</select>
+				</div>
+
+				{/* 柔和度 */}
+				<div>
+					<label className="block text-sm font-medium text-gray-700 mb-2">
+						柔和度: {grainSoftness?.value?.toFixed(2)}
+					</label>
+					<input
+						type="range"
+						min="0"
+						max="1"
+						step="0.01"
+						className="w-full"
+						value={grainSoftness?.type === 'mixed' ? 0 : grainSoftness?.value || 0}
+						onChange={(e) => {
+							markHistoryPoint()
+							const value = parseFloat(e.currentTarget.value)
+							setStyle(grainSoftnessStyle, value)
+						}}
+						title="柔和度调节滑块"
+					/>
+					<div className="flex justify-between text-xs text-gray-500">
+						<span>0</span>
+						<span>0.5</span>
+						<span>1</span>
+					</div>
+				</div>
+
+				{/* 强度 */}
+				<div>
+					<label className="block text-sm font-medium text-gray-700 mb-2">
+						强度: {grainIntensity?.value?.toFixed(2)}
+					</label>
+					<input
+						type="range"
+						min="0"
+						max="1"
+						step="0.01"
+						className="w-full"
+						value={grainIntensity?.type === 'mixed' ? 0.2 : grainIntensity?.value || 0.2}
+						onChange={(e) => {
+							markHistoryPoint()
+							const value = parseFloat(e.currentTarget.value)
+							setStyle(grainIntensityStyle, value)
+						}}
+						title="强度调节滑块"
+					/>
+					<div className="flex justify-between text-xs text-gray-500">
+						<span>0</span>
+						<span>0.5</span>
+						<span>1</span>
+					</div>
+				</div>
+
+				{/* 噪点 */}
+				<div>
+					<label className="block text-sm font-medium text-gray-700 mb-2">
+						噪点: {grainNoise?.value?.toFixed(2)}
+					</label>
+					<input
+						type="range"
+						min="0"
+						max="1"
+						step="0.01"
+						className="w-full"
+						value={grainNoise?.type === 'mixed' ? 1 : grainNoise?.value || 1}
+						onChange={(e) => {
+							markHistoryPoint()
+							const value = parseFloat(e.currentTarget.value)
+							setStyle(grainNoiseStyle, value)
+						}}
+						title="噪点调节滑块"
+					/>
+					<div className="flex justify-between text-xs text-gray-500">
+						<span>0</span>
+						<span>0.5</span>
+						<span>1</span>
+					</div>
+				</div>
+			</div>
+		)
+	}
+
 	// 获取背景类型的中文名称
 	const getBackgroundTypeName = (type: string) => {
 		switch (type) {
 			case 'gradient-flow': return '渐变流动背景'
 			case 'heatmap': return '热力图背景'
+			case 'grain-gradient': return '颗粒渐变背景'
 			default: return '动态背景'
 		}
 	}
@@ -484,6 +686,7 @@ function DynamicBackgroundStylePanel() {
 					{/* 根据背景类型显示不同的配置选项 */}
 					{backgroundType.value === 'gradient-flow' && renderGradientFlowConfig()}
 					{backgroundType.value === 'heatmap' && renderHeatmapConfig()}
+					{backgroundType.value === 'grain-gradient' && renderGrainGradientConfig()}
 				</div>
 			)}
 		</DefaultStylePanel>

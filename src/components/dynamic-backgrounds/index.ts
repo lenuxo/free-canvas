@@ -4,3 +4,4 @@
 
 export { GradientFlowBackground } from './GradientFlowBackground'
 export { HeatmapBackground } from './HeatmapBackground'
+export { GrainGradientBackground } from './GrainGradientBackground'

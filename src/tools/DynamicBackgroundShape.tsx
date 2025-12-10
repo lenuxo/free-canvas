@@ -8,6 +8,7 @@ import {
 import {
   GradientFlowBackground,
   HeatmapBackground,
+  GrainGradientBackground,
 } from "../components/dynamic-backgrounds";
 import {
   backgroundTypeStyle,
@@ -23,6 +24,12 @@ import {
   heatmapOuterGlowStyle,
   heatmapScaleStyle,
   heatmapImageStyle,
+  grainColorsStyle,
+  grainColorBackStyle,
+  grainSoftnessStyle,
+  grainIntensityStyle,
+  grainNoiseStyle,
+  grainShapeStyle,
   type BackgroundType,
   type AnimationSpeed,
   type PrimaryColor,
@@ -36,6 +43,12 @@ import {
   type HeatmapOuterGlow,
   type HeatmapScale,
   type HeatmapImage,
+  type GrainColors,
+  type GrainColorBack,
+  type GrainSoftness,
+  type GrainIntensity,
+  type GrainNoise,
+  type GrainShape,
 } from "../styles/dynamic-background-styles";
 
 /**
@@ -58,6 +71,13 @@ export interface DynamicBackgroundShapeProps {
   heatmapOuterGlow?: HeatmapOuterGlow;
   heatmapScale?: HeatmapScale;
   heatmapImage?: HeatmapImage;
+  // Grain Gradient 特有属性
+  grainColors?: GrainColors;
+  grainColorBack?: GrainColorBack;
+  grainSoftness?: GrainSoftness;
+  grainIntensity?: GrainIntensity;
+  grainNoise?: GrainNoise;
+  grainShape?: GrainShape;
 }
 
 /**
@@ -97,6 +117,13 @@ export class DynamicBackgroundShapeUtil extends BaseBoxShapeUtil<DynamicBackgrou
     heatmapOuterGlow: heatmapOuterGlowStyle,
     heatmapScale: heatmapScaleStyle,
     heatmapImage: heatmapImageStyle,
+    // Grain Gradient 特有属性
+    grainColors: grainColorsStyle,
+    grainColorBack: grainColorBackStyle,
+    grainSoftness: grainSoftnessStyle,
+    grainIntensity: grainIntensityStyle,
+    grainNoise: grainNoiseStyle,
+    grainShape: grainShapeStyle,
   };
 
   // 形状是否可以选择和编辑
@@ -123,6 +150,13 @@ export class DynamicBackgroundShapeUtil extends BaseBoxShapeUtil<DynamicBackgrou
       heatmapOuterGlow: 0.5,
       heatmapScale: 0.75,
       heatmapImage: "https://shaders.paper.design/images/logos/diamond.svg",
+      // Grain Gradient 默认值
+      grainColors: "#702200,#eaba7b,#38b422",
+      grainColorBack: "#0a0000",
+      grainSoftness: 0,
+      grainIntensity: 0.2,
+      grainNoise: 1,
+      grainShape: "sphere",
     };
   }
 
@@ -201,6 +235,24 @@ export class DynamicBackgroundShapeUtil extends BaseBoxShapeUtil<DynamicBackgrou
             outerGlow={shape.props.heatmapOuterGlow}
             scale={shape.props.heatmapScale}
             image={shape.props.heatmapImage}
+            speed={animationSpeed}
+          />
+        );
+      case "grain-gradient":
+        // 解析GrainGradient颜色字符串为数组
+        const grainColors = shape.props.grainColors?.split(",") || [
+          "#702200",
+          "#eaba7b",
+          "#38b422",
+        ];
+        return (
+          <GrainGradientBackground
+            colors={grainColors}
+            colorBack={shape.props.grainColorBack}
+            softness={shape.props.grainSoftness}
+            intensity={shape.props.grainIntensity}
+            noise={shape.props.grainNoise}
+            shape={shape.props.grainShape}
             speed={animationSpeed}
           />
         );

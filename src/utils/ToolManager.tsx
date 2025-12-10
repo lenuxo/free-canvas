@@ -81,6 +81,7 @@ class ToolManager {
 		const typeMap: Record<string, DynamicBackgroundShape['props']['backgroundType']> = {
 			'bg-gradient-flow': 'gradient-flow',
 			'bg-heatmap': 'heatmap',
+			'bg-grain-gradient': 'grain-gradient',
 		}
 		return typeMap[this.currentTool] || 'gradient-flow'
 	}
@@ -120,6 +121,7 @@ class ToolManager {
 			// 动态背景工具集
 			case 'bg-gradient-flow':
 			case 'bg-heatmap':
+			case 'bg-grain-gradient':
 				this.editor.setCurrentTool('dynamic-background')
 				// 设置对应的背景类型
 				this.setBackgroundType(toolId)
@@ -136,6 +138,7 @@ class ToolManager {
 		const typeMap: Record<string, DynamicBackgroundShape['props']['backgroundType']> = {
 			'bg-gradient-flow': 'gradient-flow',
 			'bg-heatmap': 'heatmap',
+			'bg-grain-gradient': 'grain-gradient',
 		}
 
 		const backgroundType = typeMap[toolId]
@@ -199,6 +202,11 @@ class ToolManager {
 							id: 'heatmap',
 							name: '热力图',
 							toolId: 'bg-heatmap'
+						},
+						{
+							id: 'grain-gradient',
+							name: '颗粒渐变',
+							toolId: 'bg-grain-gradient'
 						}
 					]
 				}

@@ -1,4 +1,4 @@
-import React from 'react'
+
 
 /**
  * 渐变流动背景组件
